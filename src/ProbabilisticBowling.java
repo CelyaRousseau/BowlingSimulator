@@ -7,48 +7,59 @@ public class ProbabilisticBowling {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int [] Scoring = null;
+		int [] scoring = null;
 		
 		System.out.println("Beginner");
 		for (int i = 0; i < 100; i++) {
-			Scoring = toThrow("Beginner");
-			System.out.println("Score tour 1 : " + Scoring[0] + "Score tour 2 : " + Scoring[1]);
+			scoring = toThrow("Beginner");
+			System.out.println("Score tour 1 : " + scoring[0] + "Score tour 2 : " + scoring[1]);
 		}
 		System.out.println("Casual");
 		for (int i = 0; i < 100; i++) {
-			Scoring = toThrow("Casual");
-			System.out.println("Score tour 1 : " + Scoring[0] + "Score tour 2 : " + Scoring[1]);
+			scoring = toThrow("Casual");
+			System.out.println("Score tour 1 : " + scoring[0] + "Score tour 2 : " + scoring[1]);
 		}
 		System.out.println("Advanced");
 		for (int i = 0; i < 100; i++) {
-			Scoring = toThrow("Advanced");
-			System.out.println("Score tour 1 : " + Scoring[0] + "Score tour 2 : " + Scoring[1]);
+			scoring = toThrow("Advanced");
+			System.out.println("Score tour 1 : " + scoring[0] + "Score tour 2 : " + scoring[1]);
 		}
 	}
 	
+	/**
+	 * @param String type
+	 */
 	public static int[] toThrow(String type){	
-		int[] Scoring = new int[2];
+		int[] scoring = new int[2];
 	
 		// First Lancer
-		Scoring[0] = profileThrowing(type, 10);
+		scoring[0] = profileThrowing(type, 10);
 		
-		if(isStrike(Scoring[0])){
-			Scoring[1] = 0;
+		if(isStrike(scoring[0])){
+			scoring[1] = 0;
 		}
 		else{
 			// Second Lancer
-			int remainingKeels = 10 - Scoring[0];
-			Scoring[1] = randomInRange(0, remainingKeels);
+			int remainingKeels = 10 - scoring[0];
+			scoring[1] = randomInRange(0, remainingKeels);
 		}	
-		return Scoring;
+		return scoring;
 	
 	}
-
+	
+	/**
+	 * @param int fallenKeels
+	 * @return Boolean isStrike
+	 */
 	public static boolean isStrike(int fallenKeels){
 		return fallenKeels == 10 ? true : false;
 	}
 	
-	
+	/**
+	 * @param int keelsNumber
+	 * @param String type
+	 * @return Boolean isStrike
+	 */
 	public static int profileThrowing(String type, int keelsNumber){
 		double alea;
 		int remainingKeels;
@@ -91,9 +102,13 @@ public class ProbabilisticBowling {
 			return remainingKeels;
 	}
 	
+	/**
+	 * @param int min max (range)
+	 * @return int remainingKeels
+	 */
 	public static int randomInRange(int min, int max){
-		int keelsNumber = min + (int)(Math.random() * ((max - min) + 1));
-		return keelsNumber;
+		int remainingKeels = min + (int)(Math.random() * ((max - min) + 1));
+		return remainingKeels;
 	}
 
 }
