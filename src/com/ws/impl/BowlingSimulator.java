@@ -1,35 +1,69 @@
 package com.ws.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ws.Publisher;
 import com.ws.itf.IBowlingSimulator;
+
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 /**
  * Created by Akronys on 01/02/2015.
  */
 public class BowlingSimulator implements IBowlingSimulator {
 
+    private static final String BEGINNER = "beginner";
+    private static final String CASUAL   = "casual";
+    private static final String ADVANCED = "advanced";
 
-    public int[] getScores() {
-        int[] scoring = null;
+/**    TODO : OUT WAITING
+    {
+        "game_id": 1,
+        "round_id": 4,
+        "user_id": 1,
+        "scores": [
+            2,
+            2
+        ]
+    }
+ **/
 
-        System.out.println("Beginner");
-        for (int i = 0; i < 100; i++) {
-            scoring = toThrow("Beginner");
-            System.out.println("Score tour 1 : " + scoring[0]
-                    + "Score tour 2 : " + scoring[1]);
+    // TODO : Appeler un/plusieurs services qui Renseigne la liste des joueurs, l'id de la game, l'id d'un round
+    public Response getScores(int user_id, int round_id, int game_id, String type) throws JsonProcessingException {
+        ObjectMapper mapper  = new ObjectMapper();
+        ObjectNode dataTable = Scores(user_id, round_id, game_id, type);
+
+        return Response.status(200).entity(mapper.writeValueAsString(dataTable)).build();
+    }
+
+
+    public ObjectNode Scores(int user_id, int round_id, int game_id, String type) throws JsonProcessingException {
+        int[] scoring ;
+
+        // for (int i = 0; i < counter; i++) {
+        scoring = toThrow(type);
+           /*  System.out.println("Score tour 1 : " + scoring[i][0]
+                    + "Score tour 2 : " + scoring[i][1]);
+                    */
+        // }
+
+        ObjectMapper mapper  = new ObjectMapper();
+        ObjectNode dataTable = mapper.createObjectNode();
+
+        dataTable.put("game_id", game_id);
+        dataTable.put("user_id", user_id);
+        dataTable.put("round_id", round_id);
+        dataTable.putPOJO("scores", scoring);
+
+        try {
+            new Publisher().publishScore(mapper.writeValueAsString(dataTable));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        System.out.println("Casual");
-        for (int i = 0; i < 100; i++) {
-            scoring = toThrow("Casual");
-            System.out.println("Score tour 1 : " + scoring[0]
-                    + "Score tour 2 : " + scoring[1]);
-        }
-        System.out.println("Advanced");
-        for (int i = 0; i < 100; i++) {
-            scoring = toThrow("Advanced");
-            System.out.println("Score tour 1 : " + scoring[0]
-                    + "Score tour 2 : " + scoring[1]);
-        }
-        return scoring;
+
+        return dataTable;
     }
 
     /**
@@ -74,7 +108,7 @@ public class BowlingSimulator implements IBowlingSimulator {
         int remainingKeels;
 
         switch (type) {
-            case "Beginner":
+            case BEGINNER:
                 alea = Math.random() * keelsNumber;
                 if (alea <= 1) {
                     remainingKeels = randomInRange(9, 10);
@@ -85,7 +119,7 @@ public class BowlingSimulator implements IBowlingSimulator {
                     remainingKeels = randomInRange(0, 5);
                 }
                 break;
-            case "Casual":
+            case CASUAL:
                 alea = Math.random() * keelsNumber;
                 if (alea <= 2) {
                     remainingKeels = randomInRange(9, 10);
@@ -96,7 +130,7 @@ public class BowlingSimulator implements IBowlingSimulator {
                     remainingKeels = randomInRange(4, 8);
                 }
                 break;
-            case "Advanced":
+            case ADVANCED:
                 alea = Math.random() * keelsNumber;
                 if (alea <= 2) {
                     remainingKeels = randomInRange(0, 6);
@@ -120,5 +154,6 @@ public class BowlingSimulator implements IBowlingSimulator {
         int remainingKeels = min + (int) (Math.random() * ((max - min) + 1));
         return remainingKeels;
     }
+
 
 }
