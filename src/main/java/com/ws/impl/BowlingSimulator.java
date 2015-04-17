@@ -1,6 +1,7 @@
 package com.ws.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ws.Publisher;
@@ -18,7 +19,7 @@ public class BowlingSimulator implements IBowlingSimulator {
     private static final String CASUAL   = "casual";
     private static final String ADVANCED = "advanced";
 
-/**    TODO : OUT WAITING
+    /**    TODO : OUT WAITING
     {
         "game_id": 1,
         "round_id": 4,
@@ -28,26 +29,61 @@ public class BowlingSimulator implements IBowlingSimulator {
             2
         ]
     }
+
+     {
+        users:[
+            {"id":"1"},
+            {"id":"2"},
+            {"id":"3"}
+        ]
+    }
  **/
 
     // TODO : Appeler un/plusieurs services qui Renseigne la liste des joueurs, l'id de la game, l'id d'un round
-    public Response getScores(int user_id, int round_id, int game_id, String type) throws JsonProcessingException {
+    public Response postScore(String data) throws IOException {
         ObjectMapper mapper  = new ObjectMapper();
-        ObjectNode dataTable = Scores(user_id, round_id, game_id, type);
+        int game_id  = mapper.readTree(data).get("game_id").asInt();
+        String type  = mapper.readTree(data).get("type").asText();
+        int user_id  = mapper.readTree(data).get("user_id").asInt();
+        int round_id = mapper.readTree(data).get("round_id").asInt();
+
+        ObjectNode dataTable = scores(user_id, round_id, game_id, type);
 
         return Response.status(200).entity(mapper.writeValueAsString(dataTable)).build();
     }
 
+    public Response postScores(String data) throws IOException {
+        ObjectMapper mapper       = new ObjectMapper();
+        ObjectNode dataTable      = null;
+        int game_id;
+        String type;
+        int user_id;
 
-    public ObjectNode Scores(int user_id, int round_id, int game_id, String type) throws JsonProcessingException {
+        game_id = mapper.readTree(data).get("game_id").asInt();
+        type    = mapper.readTree(data).get("type").asText();
+
+        Long sleep;
+
+        for (int i=1; i<=10; i++){
+            for (JsonNode user : mapper.readTree(data).get("users")) {
+                sleep = (long) Math.random() * (50000 - 5000) + 5000;   // Generate Random sleep to show real throw by a user
+                try {
+                    Thread.sleep(sleep);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                user_id = user.get("id").asInt();
+                dataTable = scores(user_id, i, game_id, type);
+            }
+        }
+
+        return Response.status(200).entity(mapper.writeValueAsString(dataTable)).build();
+    }
+
+    public ObjectNode scores(int user_id, int round_id, int game_id, String type) throws JsonProcessingException {
         int[] scoring ;
 
-        // for (int i = 0; i < counter; i++) {
         scoring = toThrow(type);
-           /*  System.out.println("Score tour 1 : " + scoring[i][0]
-                    + "Score tour 2 : " + scoring[i][1]);
-                    */
-        // }
 
         ObjectMapper mapper  = new ObjectMapper();
         ObjectNode dataTable = mapper.createObjectNode();
@@ -91,11 +127,7 @@ public class BowlingSimulator implements IBowlingSimulator {
      * @return isStrike Boolean
      */
     public static boolean isStrike(int fallenKeels) {
-        if (fallenKeels == 10) {
-            return true;
-        } else {
-            return false;
-        }
+        return fallenKeels == 10;
     }
 
     /**
@@ -151,8 +183,7 @@ public class BowlingSimulator implements IBowlingSimulator {
      * @return remainingKeels int
      */
     public static int randomInRange(int min, int max) {
-        int remainingKeels = min + (int) (Math.random() * ((max - min) + 1));
-        return remainingKeels;
+        return min + (int) (((max - min) + 1) * Math.random());
     }
 
 
