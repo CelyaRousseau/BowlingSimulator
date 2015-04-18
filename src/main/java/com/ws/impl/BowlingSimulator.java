@@ -85,6 +85,10 @@ public class BowlingSimulator implements IBowlingSimulator {
 
         scoring = toThrow(type);
 
+        if(round_id == 10) {
+            HandleLastTurnException(type, scoring);
+        }
+
         ObjectMapper mapper  = new ObjectMapper();
         ObjectNode dataTable = mapper.createObjectNode();
 
@@ -105,7 +109,7 @@ public class BowlingSimulator implements IBowlingSimulator {
     /**
      * @param type String
      */
-    public static int[] toThrow(String type) {
+    public int[] toThrow(String type) {
         int[] scoring = new int[2];
 
         // First Lancer
@@ -122,11 +126,18 @@ public class BowlingSimulator implements IBowlingSimulator {
 
     }
 
+    public int[] HandleLastTurnException(String type, int[] scoring) {
+        if(scoring[0] + scoring[1] == 10){
+            scoring[2] = profileThrowing(type, 10);
+        }
+        return scoring;
+    }
+
     /**
      * @param fallenKeels int
      * @return isStrike Boolean
      */
-    public static boolean isStrike(int fallenKeels) {
+    public boolean isStrike(int fallenKeels) {
         return fallenKeels == 10;
     }
 
@@ -135,7 +146,7 @@ public class BowlingSimulator implements IBowlingSimulator {
      * @param type        String
      * @return isStrike Boolean
      */
-    public static int profileThrowing(String type, int keelsNumber) {
+    public int profileThrowing(String type, int keelsNumber) {
         double alea;
         int remainingKeels;
 
@@ -182,7 +193,7 @@ public class BowlingSimulator implements IBowlingSimulator {
      * @param max int
      * @return remainingKeels int
      */
-    public static int randomInRange(int min, int max) {
+    public int randomInRange(int min, int max) {
         return min + (int) (((max - min) + 1) * Math.random());
     }
 
