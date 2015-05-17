@@ -81,12 +81,15 @@ public class BowlingSimulator implements IBowlingSimulator {
     }
 
     public ObjectNode scores(int user_id, int round_id, int game_id, String type) throws JsonProcessingException {
-        int[] scoring ;
-
-        scoring = toThrow(type);
+        int[] scoring;
 
         if(round_id == 10) {
+            scoring = new int[3];
+            scoring = toThrow(type, scoring);
             HandleLastTurnException(type, scoring);
+        } else {
+            scoring = new int[2];
+            scoring = toThrow(type, scoring);
         }
 
         ObjectMapper mapper  = new ObjectMapper();
@@ -109,8 +112,7 @@ public class BowlingSimulator implements IBowlingSimulator {
     /**
      * @param type String
      */
-    public int[] toThrow(String type) {
-        int[] scoring = new int[2];
+    public int[] toThrow(String type, int[] scoring) {
 
         // First Lancer
         scoring[0] = profileThrowing(type, 10);

@@ -7,7 +7,7 @@ import com.rabbitmq.client.*;
  */
 public class Publisher {
 
-    private static final String EXCHANGE_NAME = "logs";
+    private static final String EXCHANGE_NAME = "scoring";
 
     public  void publishScore(String message) throws java.io.IOException {
 
